@@ -3,7 +3,7 @@
 // Date: 2023-09-01
 
 // 设置开始日期（第1周星期一）,按需修改
-const startDate = new Date('2024-09-02');
+const startDate = new Date('2025-02-24');
 
 // 节次到时间范围的映射,按需修改
 const scheduleMappings = {
@@ -24,8 +24,8 @@ const scheduleMappings = {
 };
 
 // 解析HTML代码，生成iCal格式数据
-let icalData = 
-`BEGIN:VCALENDAR
+let icalData =
+  `BEGIN:VCALENDAR
 VERSION:2.0
 X-WR-CALNAME:课程表
 CALSCALE:GREGORIAN
@@ -43,13 +43,13 @@ END:VTIMEZONE
 `;
 
 function formatICalDateTime(date) {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const hours = String(date.getUTCHours()).padStart(2, '0');
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-    return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+  return `${year}${month}${day}T${hours}${minutes}${seconds}`;
 }
 
 // 找到包含课程信息的父元素
@@ -76,19 +76,19 @@ if (courseContainer) {
         return;
       }
       console.log("解析成功:", courseCode, courseName, weekText, teacher);
-      
+
       // 将多段上课信息分割
       const repeatCourse = weekText.split('\n');
       repeatCourse.forEach(weekInfo => {
         const [, weekday, schedule, place] = weekInfo.match(/星期(\S+)\[(\d+-\d+)节](.+)/);
-        // 解析每一段的周次范围
-        const weekRangeText =weekText.split(' ')[0];
+        // 修改这一行，使用当前的weekInfo而不是原始的weekText
+        const weekRangeText = weekInfo.split(' ')[0];
         weekRangeText.split(',').forEach(weekRange => {
           weekRange = weekRange.replace('周', '');
           let startWeek, endWeek;
           let step = 1;
-          if(weekRange.indexOf('-')>=0){
-            if(weekRange.indexOf('单') >= 0 || weekRange.indexOf('双') >= 0){
+          if (weekRange.indexOf('-') >= 0) {
+            if (weekRange.indexOf('单') >= 0 || weekRange.indexOf('双') >= 0) {
               weekRange = weekRange.replace('单', '');
               weekRange = weekRange.replace('双', '');
               step = 2;
@@ -101,7 +101,7 @@ if (courseContainer) {
           // 计算课程日期
           const dayOffset = ['一', '二', '三', '四', '五', '六', '日'].indexOf(weekday);
           // 循环每周生成一个事件
-          for (let i = startWeek; i <= endWeek; i+=step) {
+          for (let i = startWeek; i <= endWeek; i += step) {
             const courseStartDate = new Date(
               startDate.getTime() +
               (i - 1) * 7 * 24 * 60 * 60 * 1000 +
@@ -125,10 +125,10 @@ if (courseContainer) {
               eminutes * 60 * 1000
             );
 
-            console.log(courseName, '第'+i+'周', '星期'+weekday, schedule+'节');
+            console.log(courseName, '第' + i + '周', '星期' + weekday, schedule + '节');
 
-            icalData += 
-`
+            icalData +=
+              `
 BEGIN:VEVENT
 DESCRIPTION:${teacher}
 DTSTART;TZID=Asia/Shanghai:${formatICalDateTime(courseStartDateTime)}
@@ -142,8 +142,8 @@ END:VEVENT`;
     });
   });
 
-  icalData += 
-`
+  icalData +=
+    `
 END:VCALENDAR`;
 
   // 导出iCal数据为文件
